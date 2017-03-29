@@ -1,0 +1,143 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Template for a SPARC file
+%% Author: Even and Saul
+%% Description: Asp applied to fundamental 
+%% forces.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+sorts
+	  #elemtary_particle(quarks, leptons, gauges_bosons)
+    #particle = {proton, electron, neutron}.
+    #charge = {positive, negative, neutral}.
+    #fundametal_force = {electromagnetic, strong_force, weak_force, gravity}.
+    #elements = {carbon, hydrogen}.
+    
+predicates
+		% Denotes that X is a particle.
+    isaParticle(#particle).
+
+    % Denotes that X has a positive charge.
+    positive(#charge).
+    
+    % Denotes that X has a negative charge.
+    negative(#charge).
+    
+    % Denotes that X has a neutral charge.
+    neutral(#charge).
+    
+    % Denotes that X has a charge of Y.
+    chargeOf(#particle, #charge).
+    
+    % Denotes that X and Y are attracted to each other
+    attraction(#particle, #particle, #fundametal_force).
+    
+    % Denotes that X and Y are repel each other
+    repel(#particle, #particle).
+    
+    % Denotes that X and Y will remain in the same place.
+    neutralState(#particle, #particle).
+    
+    % Denotes that X is a force.
+    force(#fundametal_force).
+    
+    % Denotes that X is a electromagnetic force.
+    electromagneticForce(#fundametal_force).
+    
+    % Denotes that X is a strong force.
+    strong_Force(#fundametal_force).
+    
+    % Denotes that X is an atom
+    atom(#elements, #particle, #particle, #particle).
+    
+    % Denotes that X is an element
+    element(#elements).
+    
+    % Denotes that X is an subatomic particle
+    subatomic_paritcle(#particle, #particle, #particle).
+    
+    % is_a_proton(P):- Denotes that P is the positively charged particle proton
+    is_a_proton(#particle).
+    
+    % is_a_neutron(N):- Denotes that N is the neutral charged  particle neutron
+    is_a_neutron(#particle).
+    
+    % is_a_electron(E):- Denotes that E is the negatively charged particle 
+    % electron
+    is_a_electron(#particle).
+    
+
+rules
+
+		% isaParticle(X) where X is a particle.
+    isaParticle(proton).
+    isaParticle(electron).
+    isaParticle(neutron).
+
+    % force(X) where X is a force
+    force(F).
+
+    % electromagneticForce(X) where X is a electromagneticForce.
+    electromagneticForce(electromagnetic).
+    
+    % strong_Force(X) where X a strong_force.
+    strong_Force(strong_force).
+    
+    % is_a_proton(P):- Where P is a proton if P is a particle and it has a positive
+    % charge.
+    is_a_proton(P):- isaParticle(P), chargeOf(P,positive).
+    
+    % is_a_neutron(N):- Where N is a neutron if N is a particle and it has a neutral
+    % charge.
+    is_a_neutron(N):- isaParticle(N), chargeOf(N,neutral).
+    
+    % is_a_electron(E):- Where E is a electron if E is a particle and it has a negative
+    % charge.
+    is_a_electron(E):- isaParticle(E), chargeOf(E,negative).
+    
+    % element(X) Where X is a element.
+    element(carbon).
+    element(hydrogen).
+    
+    % atom(X) Where X is an atom if X is a element and it has subatomic particle proton, electron
+    % and neutrons.
+    atom(X,E,P,N):- element(X), subatomic_paritcle(E,P,N).
+    
+    % subatomic_particle(E,P,N).
+    subatomic_paritcle(E,P,N):- is_a_electron(E), is_a_proton(P), is_a_neutron(N).
+
+    
+    % positive(X) where X has a positive charge and not negative and not neutral.
+    positive(positive).
+    positive(X):- not negative(X), not neutral(X).
+    
+    % negative(X) where X has negative charge and not positive and not neutral.
+    negative(negative).
+    negative(X):- not positive(X), not neutral(X).
+    
+    % neutral(X) where X has a neutral charge and not positive and not negative.
+    neutral(neutral).
+    neutral(X):- not positive(X), not negative(X).
+    
+    % chargeOf(X,Y) where particle X has a charge of Y
+    chargeOf(proton, positive).
+    chargeOf(electron,negative).
+    chargeOf(neutron, neutral).
+    
+    % attraction(X,Y) where particle X and  particle Y are attracted to each other
+    % if X or Y has positive charge or negative charge and they do not equal each other. 
+    % If they don't repel they do not attract.
+    % If there is a X or Y is a neutron they will not attract each other.
+    attraction(X,Y,E):- chargeOf(X,U), chargeOf(Y,Z), U != Z, electromagneticForce(E), not -attraction(X,Y,E).
+    -attraction(X,Y,E):- repel(X,Y).
+    -attraction(X,Y,E):- neutralState(X,Y).
+    
+    % repel(X,Y) where X and Y will repel each other if X and Y both have
+    % a positive charge or a negative charge and are not in a neutralState
+    repel(X,Y):- chargeOf(X,U), chargeOf(Y,Z), U == Z, not neutralState(X,Y).
+
+    % neutralState(X,Y) where X or Y or both have a neutral charge
+    neutralState(X,Y):- chargeOf(X,U), neutral(U).
+    neutralState(X,Y):- chargeOf(Y,Z), neutral(Z).
+    neutralState(X,Y):- chargeOf(X,U), chargeOf(Y,U), neutral(U).
+    
+    
