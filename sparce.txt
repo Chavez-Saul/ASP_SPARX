@@ -6,14 +6,16 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 sorts
-	  #elemtary_particle(quarks, leptons, gauges_bosons)
+	#elemtary_particle = {quarks, leptons, gauges_bosons}.
     #particle = {proton, electron, neutron}.
     #charge = {positive, negative, neutral}.
     #fundametal_force = {electromagnetic, strong_force, weak_force, gravity}.
     #elements = {carbon, hydrogen}.
+    #object = {planets, people, nuclear_waste, atom_nucleus} + #particle.
     
 predicates
-		% Denotes that X is a particle.
+
+	% Denotes that X is a particle.
     isaParticle(#particle).
 
     % Denotes that X has a positive charge.
@@ -41,10 +43,16 @@ predicates
     force(#fundametal_force).
     
     % Denotes that X is a electromagnetic force.
-    electromagneticForce(#fundametal_force).
+    electromagnetic_force(#fundametal_force).
     
     % Denotes that X is a strong force.
-    strong_Force(#fundametal_force).
+    strong_force(#fundametal_force).
+
+    % Denotes that X is a weak force.
+    weak_force(#fundametal_force).
+
+    % Denotes that X is a gravitation_force
+    gravitation_force(#fundametal_force).
     
     % Denotes that X is an atom
     atom(#elements, #particle, #particle, #particle).
@@ -64,24 +72,45 @@ predicates
     % is_a_electron(E):- Denotes that E is the negatively charged particle 
     % electron
     is_a_electron(#particle).
+
+    % Denotes that X is a force that will act on object Y
+    force_act_on(#fundametal_force, #object).
+
+    % Denotes that X is a object.
+    object(#object).
     
 
 rules
 
-		% isaParticle(X) where X is a particle.
+    % isaParticle(X) where X is a particle.
     isaParticle(proton).
     isaParticle(electron).
     isaParticle(neutron).
 
-    % force(X) where X is a force
-    force(F).
+    % force(F) where F one of the four fundamental forces
+    force(Force):- electromagnetic_force(Force).
+    force(Force):- strong_force(Force).
+    force(Force):- weak_force(Force).
+    force(Force):- gravitation_force(Force).
 
-    % electromagneticForce(X) where X is a electromagneticForce.
-    electromagneticForce(electromagnetic).
+    force_act_on(electromagnetic, ).
+    force_act_on(gravity, planets).
+    force_act_on(strong_force, atom).
+
+    object(X).
+
+    % electromagnetic_force(F) where F is a electromagnetic Force.
+    electromagnetic_force(electromagnetic).
     
-    % strong_Force(X) where X a strong_force.
-    strong_Force(strong_force).
+    % strong_force(F) where F a strong force.
+    strong_force(strong_force).
     
+    % weak_force(F):- Where F is a weak force.
+    weak_force(weak_force).
+
+    % gravitation_force(F):- Where F is a gravitation force
+    gravitation_force(gravity).
+
     % is_a_proton(P):- Where P is a proton if P is a particle and it has a positive
     % charge.
     is_a_proton(P):- isaParticle(P), chargeOf(P,positive).
@@ -127,7 +156,7 @@ rules
     % if X or Y has positive charge or negative charge and they do not equal each other. 
     % If they don't repel they do not attract.
     % If there is a X or Y is a neutron they will not attract each other.
-    attraction(X,Y,E):- chargeOf(X,U), chargeOf(Y,Z), U != Z, electromagneticForce(E), not -attraction(X,Y,E).
+    attraction(X,Y,E):- chargeOf(X,U), chargeOf(Y,Z), U != Z, electromagnetic_force(E), not -attraction(X,Y,E).
     -attraction(X,Y,E):- repel(X,Y).
     -attraction(X,Y,E):- neutralState(X,Y).
     
@@ -139,5 +168,11 @@ rules
     neutralState(X,Y):- chargeOf(X,U), neutral(U).
     neutralState(X,Y):- chargeOf(Y,Z), neutral(Z).
     neutralState(X,Y):- chargeOf(X,U), chargeOf(Y,U), neutral(U).
+
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    % force_act_on(F, O):- Where force F will act upon object O 
+    force_act_on(Force, Object):- force(Force), object(Object).
     
     
